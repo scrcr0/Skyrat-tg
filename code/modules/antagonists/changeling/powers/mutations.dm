@@ -341,7 +341,7 @@
 	damage = 0
 	damage_type = BRUTE
 	range = 8
-	hitsound = 'sound/weapons/thudswoosh.ogg'
+	hitsound = 'sound/weapons/shove.ogg'
 	var/chain
 	var/obj/item/ammo_casing/magic/tentacle/source //the item that shot it
 	///Click params that were used to fire the tentacle shot
@@ -498,6 +498,7 @@
 	lefthand_file = 'icons/mob/inhands/antag/changeling_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/antag/changeling_righthand.dmi'
 	block_chance = 50
+	is_bashable = FALSE
 
 	var/remaining_uses //Set by the changeling ability.
 

@@ -80,11 +80,11 @@
 		diode = null
 		return TRUE
 
-/obj/item/laser_pointer/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+/obj/item/laser_pointer/tool_act(mob/living/user, obj/item/tool, list/modifiers)
 	if(isnull(crystal_lens))
-		return NONE
+		return ..()
 	if(tool_behaviour != TOOL_WIRECUTTER && tool_behaviour != TOOL_HEMOSTAT)
-		return NONE
+		return ..()
 	tool.play_tool_sound(src)
 	balloon_alert(user, "removed crystal lens")
 	crystal_lens.forceMove(drop_location())
@@ -275,14 +275,12 @@
 			continue
 		if(target_felinid.body_position == STANDING_UP)
 			target_felinid.setDir(get_dir(target_felinid, targloc)) // kitty always looks at the light
-			//SKYRAT EDIT REMOVAL BEGIN (removes forced felinid movement from laserpointers, also fixes the longstanding windoor negation glitch)
-			/* if(prob(effectchance * diode.rating))
+			if(prob(effectchance * diode.rating))
 				target_felinid.visible_message(span_warning("[target_felinid] makes a grab for the light!"), span_userdanger("LIGHT!"))
-				target_felinid.Move(targloc)
+				target_felinid.Move(targloc, get_dir(target_felinid, targloc))
 				log_combat(user, target_felinid, "moved with a laser pointer", src)
-			else 
-			SKYRAT EDIT REMOVAL END */
-			target_felinid.visible_message(span_notice("[target_felinid] looks briefly distracted by the light."), span_warning("You're briefly tempted by the shiny light...")) //SKYRAT EDIT CHANGE : indent this block if re-enabling above
+			else
+				target_felinid.visible_message(span_notice("[target_felinid] looks briefly distracted by the light."), span_warning("You're briefly tempted by the shiny light..."))
 		else
 			target_felinid.visible_message(span_notice("[target_felinid] stares at the light."), span_warning("You stare at the light..."))
 	//The pointer is shining, change its sprite to show

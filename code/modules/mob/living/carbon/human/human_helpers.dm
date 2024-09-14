@@ -57,15 +57,30 @@
 	return if_no_id
 
 //repurposed proc. Now it combines get_id_name() and get_face_name() to determine a mob's name variable. Made into a separate proc as it'll be useful elsewhere
-/mob/living/carbon/human/get_visible_name(add_id_name = TRUE)
-	if(HAS_TRAIT(src, TRAIT_UNKNOWN))
-		return "Unknown"
-	var/list/identity = list(null, null)
+/mob/living/carbon/human/get_visible_name(add_id_name = TRUE, force_real_name = FALSE)
+	var/list/identity = list(null, null, null)
 	SEND_SIGNAL(src, COMSIG_HUMAN_GET_VISIBLE_NAME, identity)
 	var/signal_face = LAZYACCESS(identity, VISIBLE_NAME_FACE)
 	var/signal_id = LAZYACCESS(identity, VISIBLE_NAME_ID)
+	var/force_set = LAZYACCESS(identity, VISIBLE_NAME_FORCED)
+	if(force_set) // our name is overriden by something
+		return signal_face // no need to null-check, because force_set will always set a signal_face
 	var/face_name = !isnull(signal_face) ? signal_face : get_face_name("")
 	var/id_name = !isnull(signal_id) ? signal_id : get_id_name("")
+	if (force_real_name)
+		var/fake_name
+		if (face_name && face_name != real_name)
+			fake_name = face_name
+		if(add_id_name && id_name && id_name != real_name)
+			if (!isnull(fake_name) && id_name != face_name)
+				fake_name = "[fake_name]/[id_name]"
+			else
+				fake_name = id_name
+		if (HAS_TRAIT(src, TRAIT_UNKNOWN) || (!face_name && !id_name))
+			fake_name = "Unknown"
+		return "[real_name][fake_name ? " (as [fake_name])" : ""]"
+	if(HAS_TRAIT(src, TRAIT_UNKNOWN))
+		return "Unknown"
 	if(face_name)
 		if(add_id_name && id_name && (id_name != face_name))
 			return "[face_name] (as [id_name])"
@@ -95,6 +110,11 @@
 	var/obj/item/card/id/id = wear_id
 	if(HAS_TRAIT(src, TRAIT_UNKNOWN))
 		. = if_no_id //You get NOTHING, no id name, good day sir
+		var/list/identity = list(null, null, null)
+		SEND_SIGNAL(src, COMSIG_HUMAN_GET_FORCED_NAME, identity)
+		if(identity[VISIBLE_NAME_FORCED])
+			. = identity[VISIBLE_NAME_FACE] // to return forced names when unknown, instead of ID
+			return
 	if(istype(wallet))
 		id = wallet.front_id
 	if(istype(id))
@@ -270,8 +290,10 @@
 /mob/living/carbon/human/proc/set_mob_height(new_height)
 	if(mob_height == new_height)
 		return FALSE
-	if(new_height == HUMAN_HEIGHT_DWARF)
-		CRASH("Don't set height to dwarf height directly, use dwarf trait")
+	if(new_height == HUMAN_HEIGHT_DWARF || new_height == MONKEY_HEIGHT_DWARF)
+		CRASH("Don't set height to dwarf height directly, use dwarf trait instead.")
+	if(new_height == MONKEY_HEIGHT_MEDIUM)
+		CRASH("Don't set height to monkey height directly, use monkified gene/species instead.")
 
 	mob_height = new_height
 	regenerate_icons()
@@ -286,7 +308,18 @@
  */
 /mob/living/carbon/human/proc/get_mob_height()
 	if(HAS_TRAIT(src, TRAIT_DWARF))
-		return HUMAN_HEIGHT_DWARF
+		if(ismonkey(src))
+			return MONKEY_HEIGHT_DWARF
+		else
+			return HUMAN_HEIGHT_DWARF
+	if(HAS_TRAIT(src, TRAIT_TOO_TALL))
+		if(ismonkey(src))
+			return MONKEY_HEIGHT_TALL
+		else
+			return HUMAN_HEIGHT_TALLEST
+
+	else if(ismonkey(src))
+		return MONKEY_HEIGHT_MEDIUM
 
 	return mob_height
 
@@ -354,7 +387,7 @@
 
 /mob/living/carbon/human/proc/item_heal(mob/user, brute_heal, burn_heal, heal_message_brute, heal_message_burn, required_bodytype)
 	var/obj/item/bodypart/affecting = src.get_bodypart(check_zone(user.zone_selected))
-	if (!affecting || !(affecting.bodytype == required_bodytype))
+	if (!affecting || !(affecting.bodytype & required_bodytype))
 		to_chat(user, span_warning("[affecting] is already in good condition!"))
 		return FALSE
 

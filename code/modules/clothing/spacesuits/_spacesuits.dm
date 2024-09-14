@@ -24,6 +24,7 @@
 	flags_cover = HEADCOVERSEYES | HEADCOVERSMOUTH | PEPPERPROOF
 	resistance_flags = NONE
 	dog_fashion = null
+	slowdown = 0.5
 
 /datum/armor/helmet_space
 	bio = 100
@@ -47,9 +48,9 @@
 		/obj/item/tank/internals,
 		/obj/item/tank/jetpack/oxygen/captain,
 		)
-	slowdown = 1
+	slowdown = 0.5
 	armor_type = /datum/armor/suit_space
-	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDESEXTOY|HIDETAIL //SKYRAT EDIT CHANGE - ADDED HIDETAIL. ADDED HIDESEXTOY TO PREVENT VISUAL BUGS.
+	flags_inv = HIDEGLOVES|HIDESHOES|HIDEJUMPSUIT|HIDESEXTOY|HIDETAIL|HIDETAUR //SKYRAT EDIT CHANGE - ADDED HIDETAIL, HIDETAUR. ADDED HIDESEXTOY TO PREVENT VISUAL BUGS.
 	cold_protection = CHEST | GROIN | LEGS | FEET | ARMS | HANDS
 	min_cold_protection_temperature = SPACE_SUIT_MIN_TEMP_PROTECT_OFF
 	heat_protection = CHEST|GROIN|LEGS|FEET|ARMS|HANDS
@@ -62,7 +63,7 @@
 	/// The default temperature setting
 	var/temperature_setting = BODYTEMP_NORMAL
 	/// If this is a path, this gets created as an object in Initialize.
-	var/obj/item/stock_parts/cell/cell = /obj/item/stock_parts/cell/high
+	var/obj/item/stock_parts/power_store/cell = /obj/item/stock_parts/power_store/cell/high
 	/// Status of the cell cover on the suit
 	var/cell_cover_open = FALSE
 	/// Status of the thermal regulator
@@ -185,7 +186,7 @@
 
 // object handling for accessing features of the suit
 /obj/item/clothing/suit/space/attackby(obj/item/I, mob/user, params)
-	if(!cell_cover_open || !istype(I, /obj/item/stock_parts/cell))
+	if(!cell_cover_open || !istype(I, /obj/item/stock_parts/power_store/cell))
 		return ..()
 	if(cell)
 		to_chat(user, span_warning("[src] already has a cell installed."))

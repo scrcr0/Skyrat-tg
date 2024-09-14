@@ -16,7 +16,7 @@ export NODE_VERSION_LTS=20.12.0
 export NODE_VERSION_COMPAT=14.16.1
 
 # SpacemanDMM git tag
-export SPACEMAN_DMM_VERSION=suite-1.8
+export SPACEMAN_DMM_VERSION=suite-1.9
 
 # Python version for mapmerge and other tools
 export PYTHON_VERSION=3.9.0
@@ -31,4 +31,4 @@ export AUXLUA_VERSION=1.4.4
 export CUTTER_REPO=spacestation13/hypnagogic
 
 #hypnagogic git tag
-export CUTTER_VERSION=v3.1.0
+export CUTTER_VERSION=v4.0.0
